@@ -45,6 +45,9 @@ def create_app():
     app.register_blueprint(koupean_bp, url_prefix='/koupean')
     app.register_blueprint(board_bp, url_prefix='/board')
     
+    @app.route('/')
+    def nothing():
+        return {"message": "Welcome to the API!"}, 200
 
 
     return app
