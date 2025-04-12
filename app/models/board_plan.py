@@ -32,6 +32,8 @@ def threshold(level):
             return 672
         case 10:
             return 1400
+        case _:
+            return 0  # Default case, should not happen
         
 
 def find_level(id):
@@ -105,26 +107,24 @@ def board(userid):
     
     
     parent_id = get_parent_id(userid)
-    if parent_id is None:
-        return None
-    
-    parent_level = find_level(parent_id)
-    parent_child_count = child_counts(parent_id, parent_level)
-    
-    sales = Sell.get_sales(parent_id) or 0  # Default to 0 if None
-    if parent_child_count + child_count > 5 and sales >= threshold(parent_level):
+    if parent_id:
+        parent_level = find_level(parent_id)
+        parent_child_count = child_counts(parent_id, parent_level)
+        
+        sales = Sell.get_sales(parent_id) or 0  # Default to 0 if None
+        if parent_child_count + child_count > 5 and sales >= threshold(parent_level):
 
-        query="UPDATE users SET level = level + 1 WHERE id = %s"
-        values = (parent_id,)
-        cursor = mysql.connection.cursor()
-        try:
-            cursor.execute(query, values)
-            mysql.connection.commit()
-        except Exception as e:
-            print(f"Error updating parent level: {e}")
-            mysql.connection.rollback()
-        finally:
-            cursor.close()
+            query="UPDATE users SET level = level + 1 WHERE id = %s"
+            values = (parent_id,)
+            cursor = mysql.connection.cursor()
+            try:
+                cursor.execute(query, values)
+                mysql.connection.commit()
+            except Exception as e:
+                print(f"Error updating parent level: {e}")
+                mysql.connection.rollback()
+            finally:
+                cursor.close()
 
 
     
