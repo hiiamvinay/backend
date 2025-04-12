@@ -9,9 +9,13 @@ USE board_plan;
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    phone_number VARCHAR(15) NOT NULL, -- Adjusted length for typical phone numbers
-    password VARCHAR(255) NOT NULL
-);
+    phone_number VARCHAR(15) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    parent_id INT DEFAULT NULL,
+    level INT DEFAULT 0,
+    FOREIGN KEY (parent_id) REFERENCES users(id)
+)  AUTO_INCREMENT=100;
+
 
 CREATE TABLE sales (
     id INT AUTO_INCREMENT PRIMARY KEY,

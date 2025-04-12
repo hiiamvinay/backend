@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify
 from app.models.sells import Sell
 from app.models.koupean import verify_koupean, delete_koupean_by_code
+from app.models.users import create_user, is_phone_number_exists
+from app.models.board_plan import board
+from app.services.random_pass import random_password
 
 
 mysql = None 
@@ -38,17 +41,26 @@ def add_sale():
 @sell_bp.route('/kounen-payment', methods=['POST'])
 def kounen_payment():
     """API to record a kounen payment."""
-    data = request.json
-    user_id = data.get("user_id")
-    code = data.get("kounen_code")
+    data = request.get_json()
+    user_id = data.get('user_id')
+    kounen_code = data.get('kounen_code')
+    buyer_name = data.get('buyer_name')
+    buyer_phone = data.get('buyer_phone')
 
-    if not user_id or not code:
+
+    if not user_id or not kounen_code or not buyer_name or not buyer_phone:
         return jsonify({"error": "Missing user_id or kounen_code"}), 400
     
-    if not verify_koupean(code):
+    if not verify_koupean(kounen_code):
         return jsonify({"error": "Invalid kounen code"}), 400
     else:
         Sell.add_sale(user_id, 1)
-        delete_koupean_by_code(str(code))
-        return jsonify({"message": "sale is successfully"}), 200
-    return jsonify({"message": "sale is successfully"}), 200
+        if is_phone_number_exists(buyer_phone):
+            delete_koupean_by_code(str(kounen_code))
+            return jsonify({"message": "sale is successfully"}), 200
+        else:  
+            create_user(buyer_name,buyer_phone, random_password(), parent_id=user_id)
+            board(userid=user_id)
+            delete_koupean_by_code(str(kounen_code))
+            return jsonify({"message": "sale is successfully"}), 200
+    return jsonify({"error": "Failed to record sale"}), 500 

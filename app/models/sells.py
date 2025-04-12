@@ -1,3 +1,6 @@
+from app.models.board_plan import threshold, find_level
+
+
 mysql = None
 
 def init_model_sell(mysql_instance):
@@ -40,29 +43,51 @@ class Sell:
         finally:
             cursor.close()
 
-    def mini_id():
-        query = """SELECT MIN(id) FROM users """
-        cursor = mysql.connection.cursor()
-        try:
-            cursor.execute(query)
-            min_id = cursor.fetchone()[0]
-            return min_id
-        finally:
-            cursor.close()
+    
     
     
          
     
     @staticmethod
-    def get_sales_details(user_id, salary_threshold=-1, next_level_threshold=7):
+    def get_sales_details(user_id):
         """Get sales details including sales done, required for salary, and for next level."""
+
         sales_done = Sell.get_sales(user_id)
-        sales_needed_for_next_level = max(0, next_level_threshold - sales_done)
-        sales_needed_for_salary=-1
+        if find_level(user_id) == 0:
+            sales_needed_for_salary = -1
+        else:
+            sales_needed_for_salary = threshold(find_level(user_id)) - sales_done
+
+        sales_needed_for_next_level = 6 - sales_done
+        
+        #get_name
+        query = "SELECT name, level FROM users WHERE id = %s"
+        values = (user_id,)
+        cursor = mysql.connection.cursor()
+        try:
+            cursor.execute(query, values)
+            row = cursor.fetchone()
+            if row:
+                name = row[0]
+                level = row[1]
+            else:
+                name = None
+                level = None
+        except Exception as e:
+            print(f"Error fetching user details: {e}")
+            name = None
+            level = None
+        finally:
+            cursor.close()
+
+
+
     
 
         return {
             "sales_done": sales_done,
             "sales_needed_for_salary": sales_needed_for_salary,
-            "sales_needed_for_next_level": sales_needed_for_next_level
+            "sales_needed_for_next_level": sales_needed_for_next_level,
+            "name": name,
+            "level": level+1,
         }

@@ -8,11 +8,11 @@ def init_model_user(mysql_instance):
     global mysql
     mysql = mysql_instance
 
-def create_user(name, phone_number, password):
+def create_user(name, phone_number, password, parent_id=0):
     """Create a new user."""
     hashed_password = generate_password_hash(password)
-    query = "INSERT INTO users (name, phone_number, password) VALUES (%s, %s, %s)"
-    values = (name, phone_number, hashed_password)
+    query = "INSERT INTO users (name, phone_number, password, parent_id) VALUES (%s, %s, %s, %s)"
+    values = (name, phone_number, hashed_password, parent_id)
 
     connection = mysql.connection  # Corrected database connection
     cursor = connection.cursor()
