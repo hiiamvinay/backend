@@ -12,9 +12,9 @@ CREATE TABLE users (
     phone_number VARCHAR(15) NOT NULL,
     password VARCHAR(255) NOT NULL,
     parent_id INT DEFAULT NULL,
-    level INT DEFAULT 0,
-    FOREIGN KEY (parent_id) REFERENCES users(id)
-)  AUTO_INCREMENT=100;
+    level INT DEFAULT 0
+) AUTO_INCREMENT=100;
+
 
 
 CREATE TABLE sales (

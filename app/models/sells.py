@@ -56,7 +56,10 @@ class Sell:
         if find_level(user_id) == 0:
             sales_needed_for_salary = -1
         else:
-            sales_needed_for_salary = threshold(find_level(user_id)) - sales_done
+            if sales_done >= threshold(find_level(user_id)):
+                sales_needed_for_salary = 0
+            else:
+                sales_needed_for_salary = threshold(find_level(user_id)) - sales_done
 
         sales_needed_for_next_level = 6 - sales_done
         

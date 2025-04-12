@@ -111,7 +111,9 @@ def board(userid):
     parent_level = find_level(parent_id)
     parent_child_count = child_counts(parent_id, parent_level)
     
-    if parent_child_count + child_count>5 and Sell.get_sales(parent_id) >= threshold(parent_level):
+    sales = Sell.get_sales(parent_id) or 0  # Default to 0 if None
+    if parent_child_count + child_count > 5 and sales >= threshold(parent_level):
+
         query="UPDATE users SET level = level + 1 WHERE id = %s"
         values = (parent_id,)
         cursor = mysql.connection.cursor()
